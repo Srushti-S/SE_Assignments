@@ -1,0 +1,62 @@
+section .data
+msg1 db "Enter 5 64-bit numbers ",10
+len1 equ $-msg1
+newline db 10
+msg2 db "Entered 64-bit numbers  are: ",10
+len2 equ $-msg2
+count db 05
+
+%macro print 4
+mov rax,%1
+mov rdi,%2
+mov rsi,%3
+mov rdx,%4
+syscall
+%endmacro
+
+section .bss
+array resb 100
+
+section .text
+global _start
+_start:
+
+print 01,01,msg1,len1
+
+
+mov rbx,array
+
+up:
+	;print 00,00,rbx,17
+	mov rax,00
+	mov rdi,00
+	mov rsi,rbx
+	mov rdx,17
+	syscall
+	add rbx,17
+	dec byte[count]
+	jnz up
+
+	
+mov byte[count],05
+mov rbx,array
+
+print 01,01,msg2,len2
+
+
+up1:
+	;print 01,01,rbx,17
+	mov rax,01
+	mov rdi,01
+	mov rsi,rbx
+	mov rdx,17
+	syscall
+	add rbx,17
+	dec byte[count]
+	jnz up1
+	
+
+;exit syscall
+mov rax,60
+mov rdi,00
+syscall
