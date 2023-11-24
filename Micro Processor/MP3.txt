@@ -1,0 +1,70 @@
+section .data
+array db 44h,01h,22h,33h,02h
+msg db "Largest number is: ",10
+len equ $-msg
+newline db 10
+
+
+%macro print 4
+mov rax,%1
+mov rdi,%2
+mov rsi,%3
+mov rdx,%4
+syscall
+%endmacro
+
+section .bss
+count resb 02
+result resb 20
+output resb 10
+ 
+
+section .text
+global _start
+_start:
+
+mov byte[count],05
+mov rsi,array
+mov ch,05
+mov bl,00
+mov rbx,00
+
+up:
+	cmp bl,[rsi]
+	jge skip
+	mov bl,[rsi]
+skip:
+	inc rsi
+	dec byte[count]
+	jnz up
+	
+mov [result],bl
+mov byte[count],02
+
+call disp
+print 01,01,msg,len
+print 01,01,output,02
+print 01,01,newline,01
+
+
+mov rax,60
+mov rdi,00
+syscall
+
+disp:
+	mov rsi,output
+	mov bl,[result]
+	up1:
+		rol bl,04
+		mov dl,bl
+		and dl,0Fh
+		cmp dl,09
+		jbe down
+		add dl,07h
+	down:
+		add dl,30h
+		mov [rsi],dl
+		inc rsi
+		dec byte[count]
+		jnz up1
+ret

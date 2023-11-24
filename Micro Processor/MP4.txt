@@ -1,0 +1,85 @@
+section .data
+	msg1 db "Count of Positive numbers:	"
+	len1 equ $-msg1
+	newline db 10
+
+	msg2 db "Count of Negative numbers:	"
+	len2 equ $-msg2
+
+	array db 6h,19h,-27h,-12h,-16h,-32h,13h,15h,-20h
+
+%macro print 2
+	mov rax,01
+	mov rdi,01
+	mov rsi,%1
+	mov rdx,%2
+	syscall
+%endmacro
+
+section .bss
+	cnt resb 02
+	pcnt resb 02
+
+	ncnt resb 02
+	totalcnt resb 02
+
+section .text
+global _start
+_start:
+
+	mov byte[cnt],09
+	mov byte[pcnt],00
+	mov byte[ncnt],00
+
+	mov rsi,array
+
+Up:
+	mov al,00
+	add al,[rsi]
+	js neg
+	inc byte[pcnt]
+	jmp Down
+neg:
+	inc byte[ncnt]
+
+Down:
+	add rsi,01
+
+	dec byte[cnt]
+	jnz Up
+
+	;mov bl,[pcnt]
+	;mov dl,[ncnt]
+b1:
+
+	print msg1,len1
+	mov bh,[pcnt]
+	call disp
+	print newline,01
+
+	print msg2,len2
+	mov bh,[ncnt]
+	call disp
+	print newline,01
+
+	mov rax,60
+	mov rdi,00
+	syscall
+
+disp:
+	mov byte[cnt],02
+
+loop:
+	rol bh,04
+	mov al,bh
+	AND al,0FH
+	cmp al,09
+	jbe l1
+	add al,07h
+l1:
+	add al,30h
+	mov[totalcnt],al
+	print totalcnt,02
+	dec byte[cnt]
+	jnz loop
+	ret

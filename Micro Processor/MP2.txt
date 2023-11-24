@@ -1,0 +1,46 @@
+section .data
+	msg db "Hello" ,10
+	len equ $-msg
+	msg2 db "Enter a string:  " 
+	len2 equ $-msg2
+	msg3 db "Length of the entered string is:  "
+	len3 equ $-msg3
+	newline db 10
+
+section .bss
+;n1 resb 2
+ip resb 100
+str_len resb 10
+
+%macro print 4
+	mov rax,%1
+	mov rdi,%2
+	mov rsi,%3
+	mov rdx,%4
+	syscall
+%endmacro
+
+section .text
+
+global _start
+_start:
+
+print 01,01,msg,len
+print 01,01,msg2,len2
+print 00,00,ip,20
+mov rdx,[ip]
+
+cmp rax, 09
+jbe down
+add rax,07
+down:
+	add rax,30h
+	mov [str_len],rax
+
+print 01,01,msg3,len3
+print 01,01,str_len,8
+print 01,01,newline,01
+
+mov rax,60
+mov rdi,00
+syscall
